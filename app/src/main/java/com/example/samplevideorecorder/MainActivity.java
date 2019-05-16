@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        // SurfaceView 는 서피스홀더에 의해 제어
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);  // 카메라 미리보기
         holder = surfaceView.getHolder();
 
         Button recordBtn = (Button) findViewById(R.id.recordBtn);
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 recorder = new MediaRecorder();
 
+                // MediaRecorder 객체에 필요한 정보 설정
                 recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                 recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
 
                 recorder.setOutputFile(path);
-                recorder.setPreviewDisplay(holder.getSurface());
+                recorder.setPreviewDisplay(holder.getSurface());  // MediaRecorder에 미리보기 디스플레이로 SurfaceView 설정
                 try {
                     recorder.prepare();
                     recorder.start();
@@ -67,20 +69,23 @@ public class MainActivity extends AppCompatActivity {
                 if (recorder == null)
                     return;
 
+                // 녹화 중지 후 리소스 해제
                 recorder.stop();
                 recorder.reset();
                 recorder.release();
                 recorder = null;
 
+                // 미디어 앨범에 저장하기위해 내용 제공자 사용
                 ContentValues values = new ContentValues(10);
 
                 values.put(MediaStore.MediaColumns.TITLE, "RecordedVideo");
                 values.put(MediaStore.Audio.Media.ALBUM, "Video Album");
                 values.put(MediaStore.Audio.Media.ARTIST, "Mike");
                 values.put(MediaStore.Audio.Media.DISPLAY_NAME, "Recorded Video");
-                values.put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis()/1000);
+                values.put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
                 values.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
                 values.put(MediaStore.Audio.Media.DATA, path);
+
                 Uri videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
                 if (videoUri == null) {
                     Log.d("SampleVideoRecorder", "Video insert failed.");
